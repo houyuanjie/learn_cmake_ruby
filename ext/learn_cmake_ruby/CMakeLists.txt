@@ -27,8 +27,18 @@ target_include_directories(learn_cmake_ruby PUBLIC ${Ruby_INCLUDE_DIRS})
 # Remove the lib prefix, common practice in Ruby land
 set_target_properties(learn_cmake_ruby PROPERTIES
   PREFIX ""
-  INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/learn_cmake_ruby
 )
+
+# RPATH
+if(APPLE)
+  set_target_properties(learn_cmake_ruby PROPERTIES
+    INSTALL_RPATH "@loader_path"
+  )
+elseif(UNIX)
+  set_target_properties(learn_cmake_ruby PROPERTIES
+    INSTALL_RPATH "\$ORIGIN"
+  )
+endif()
 
 install(
   TARGETS learn_cmake_ruby hello
