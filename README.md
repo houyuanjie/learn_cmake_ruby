@@ -1,35 +1,111 @@
-# LearnCmakeRuby
+# LearnCmakeRuby - 使用 CMake 构建 Ruby 扩展
 
-TODO: Delete this and the text below, and describe your gem
+本项目展示了如何使用 CMake 构建 Ruby 的 C 扩展，并打包为 Gem
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/learn_cmake_ruby`. To experiment with that code, run `bin/console` for an interactive prompt.
+## 项目结构
 
-## Installation
-
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```
+.
+├── ext/
+│  └─── learn_cmake_ruby/       # C 扩展
+│      ├── learn_cmake_ruby.c   # C 扩展入口
+│      ├── CMakeLists.txt       # CMake 配置文件
+│      └── vendor/              # CMake 子项目依赖
+├── lib/                        # Ruby 代码
+├── Rakefile                    # 构建任务
+├── learn_cmake_ruby.gemspec    # Gem 配置
+└── Gemfile                     # 依赖管理
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+## 核心配置
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+### 1. gemspec
+
+```ruby
+# 包含 Ruby 代码和 C 扩展代码
+spec.files = FileList[
+  "lib/**/*.rb",
+  "ext/learn_cmake_ruby/*.{c,cpp,h}",
+  "ext/learn_cmake_ruby/vendor/**/*",
+  # 如果 C 扩展有多层目录，需要包含所有的 CMakeLists.txt
+  # "ext/learn_cmake_ruby/**/CMakeLists.txt",
+]
+
+# 指定扩展构建文件，Bundler 支持 CMakeLists.txt
+# 这个文件会被自动加到 spec.files 中，如果 C 扩展只有一层目录，可以在 spec.files 中省略
+spec.extensions = ["ext/learn_cmake_ruby/CMakeLists.txt"]
 ```
 
-## Usage
+### 2. CMake 配置
 
-TODO: Write usage instructions here
+```cmake
+# 查找 Ruby 环境
+find_package(Ruby 3.1 REQUIRED)
 
-## Development
+# 将 C 扩展构建为共享库
+add_library(learn_cmake_ruby SHARED learn_cmake_ruby.c)
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# 链接 C 扩展依赖的库
+target_link_libraries(learn_cmake_ruby PUBLIC hello)
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+# 链接 Ruby 库
+target_link_libraries(learn_cmake_ruby PUBLIC ${Ruby_LIBRARIES})
+target_include_directories(learn_cmake_ruby PUBLIC ${Ruby_INCLUDE_DIRS})
 
-## Contributing
+# 省略 lib 前缀
+# 将其依赖安装到相同的目录下
+set_target_properties(learn_cmake_ruby PROPERTIES
+  PREFIX ""
+  INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/learn_cmake_ruby
+)
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/learn_cmake_ruby.
+# 安装 C 扩展和它的依赖
+# 安装到该扩展特定的目录下
+install(
+  TARGETS learn_cmake_ruby hello
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/learn_cmake_ruby
+)
+```
+
+### 3. Rake 任务
+
+```ruby
+# 加载 Bundler 任务
+require "bundler/gem_tasks"
+
+# 在 Bundler 构建前进行 CMake 构建
+task build: :cmake
+
+task :cmake do
+  sh "cmake -S #{ext_dir} -B #{build_dir} -DCMAKE_INSTALL_PREFIX=#{lib_dir}"
+  sh "cmake --build #{build_dir}"
+  sh "cmake --install #{build_dir}"
+end
+```
+
+> 注意：这个 rake cmake 构建任务只会在开发时使用，用户安装时，Bundler 会自动使用 spec.extensions 来构建 C 扩展
+
+## 构建
+
+```bash
+bundle
+rake build
+```
+
+## 交互测试
+
+```bash
+irb -I lib -r learn_cmake_ruby
+```
+
+或者
+
+```bash
+bin/console
+```
+
+## 安装
+
+```bash
+gem install pkg/learn_cmake_ruby-0.1.0.gem
+```
