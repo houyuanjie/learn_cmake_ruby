@@ -77,7 +77,6 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  fileutils
   irb
   learn_cmake_ruby!
   rake

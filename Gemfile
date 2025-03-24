@@ -7,6 +7,5 @@ gemspec
 
 gem "irb"
 gem "rake"
-gem "fileutils"
 gem "tmpdir"
 gem "standard"

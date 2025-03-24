@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "fileutils"
 require "tmpdir"
 
 require "bundler/gem_tasks"
+require "rake/clean"
 require "standard/rake"
 
 task build: :cmake
@@ -24,6 +24,7 @@ task :cmake do
 
     unless File.exist?(ext)
       puts "[WARN] Skipping extension: #{ext}, file does not exist."
+      next
     end
 
     unless File.basename(ext) == "CMakeLists.txt"
@@ -40,7 +41,7 @@ task :cmake do
 
     full_ext_dir = File.expand_path(ext_dir, __dir__)
     full_lib_dir = File.expand_path("lib", __dir__)
-    FileUtils.mkdir_p(full_lib_dir)
+    mkdir_p(full_lib_dir)
 
     Dir.mktmpdir do |build_dir|
       puts "[INFO] Created temporary build directory: #{build_dir} for extension: #{ext}"
@@ -51,7 +52,7 @@ task :cmake do
         "-S", full_ext_dir,
         "-B", build_dir,
         "-G", "Ninja",
-        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_BUILD_TYPE=Debug",
         "-DCMAKE_INSTALL_PREFIX=#{full_lib_dir}"
       )
 
@@ -63,3 +64,7 @@ task :cmake do
     end
   end
 end
+
+CLEAN << FileList["lib/**/*.{so,dylib,dll}"]
+
+task default: %i[clobber cmake standard]
