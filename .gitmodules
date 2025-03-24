@@ -1,0 +1,3 @@
+[submodule "ext/learn_cmake_ruby/vendor/learn_cmake"]
+	path = ext/learn_cmake_ruby/vendor/learn_cmake
+	url = https://github.com/houyuanjie/learn_cmake.git
