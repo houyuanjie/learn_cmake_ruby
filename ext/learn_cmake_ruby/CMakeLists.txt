@@ -32,6 +32,6 @@ set_target_properties(learn_cmake_ruby PROPERTIES
 
 install(
   TARGETS learn_cmake_ruby hello
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/learn_cmake_ruby
+  LIBRARY DESTINATION learn_cmake_ruby
 )
 # end learn_cmake_ruby
