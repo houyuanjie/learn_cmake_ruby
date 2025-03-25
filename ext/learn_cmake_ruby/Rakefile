@@ -1,0 +1,30 @@
+require "tmpdir"
+
+RUBYARCHDIR = ENV.fetch("RUBYARCHDIR")
+
+CMAKE_GENERATOR = (
+  case RUBY_PLATFORM
+  when /mingw/
+    "MinGW Makefiles"
+  when /msys/
+    "MSYS Makefiles"
+  else
+    "Unix Makefiles"
+  end
+)
+
+task :default do
+  Dir.mktmpdir do |build_dir|
+    sh(
+      "cmake",
+      "-S", __dir__,
+      "-B", build_dir,
+      "-G", CMAKE_GENERATOR,
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_INSTALL_PREFIX=#{RUBYARCHDIR}"
+    )
+
+    sh("cmake", "--build", build_dir)
+    sh("cmake", "--install", build_dir)
+  end
+end
