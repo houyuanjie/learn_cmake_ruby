@@ -28,8 +28,12 @@ task :cmake do
     end
 
     unless File.basename(ext) == "CMakeLists.txt"
-      puts "[WARN] Skipping extension: #{ext}, not a CMakeLists.txt file."
-      next
+      if File.exist?(File.expand_path("../CMakeLists.txt", ext))
+        puts "[INFO] Using CMakeLists.txt in parent directory for extension: #{ext}"
+      else
+        puts "[WARN] Skipping extension: #{ext}, no CMakeLists.txt found in parent directory."
+        next
+      end
     end
 
     ext_dir = File.dirname(ext)

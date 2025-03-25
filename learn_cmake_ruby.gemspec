@@ -33,13 +33,14 @@ Gem::Specification.new do |spec|
   spec.files = FileList[
     "lib/**/*.rb",
     "ext/learn_cmake_ruby/*.{c,cpp,h}",
+    "ext/learn_cmake_ruby/**/CMakeLists.txt",
     "ext/learn_cmake_ruby/vendor/**/*"
   ]
 
   # spec.bindir = "exe"
   # spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.extensions = ["ext/learn_cmake_ruby/CMakeLists.txt"]
+  spec.extensions = ["ext/learn_cmake_ruby/Rakefile"]
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"

@@ -40,8 +40,16 @@ elseif(UNIX)
   )
 endif()
 
-install(
-  TARGETS learn_cmake_ruby hello
-  LIBRARY DESTINATION learn_cmake_ruby
-)
+# Install
+if(UNIX)
+  install(
+    TARGETS learn_cmake_ruby hello
+    LIBRARY DESTINATION learn_cmake_ruby
+  )
+elseif(WIN32)
+  install(
+    TARGETS learn_cmake_ruby hello
+    RUNTIME DESTINATION learn_cmake_ruby
+  )
+endif()
 # end learn_cmake_ruby
