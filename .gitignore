@@ -8,6 +8,8 @@
 /tmp/
 *.bundle
 *.so
+*.dylib
+*.dll
 *.o
 *.a
 mkmf.log
