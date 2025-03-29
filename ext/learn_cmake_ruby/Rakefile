@@ -1,6 +1,6 @@
 require "tmpdir"
 
-RUBYARCHDIR = ENV.fetch("RUBYARCHDIR")
+FULL_EXT_ROOT = File.expand_path(ENV.fetch("RUBYARCHDIR"))
 
 CMAKE_GENERATOR = (
   case RUBY_PLATFORM
@@ -21,7 +21,7 @@ task :default do
       "-B", build_dir,
       "-G", CMAKE_GENERATOR,
       "-DCMAKE_BUILD_TYPE=Release",
-      "-DCMAKE_INSTALL_PREFIX=#{RUBYARCHDIR}"
+      "-DCMAKE_INSTALL_PREFIX=#{FULL_EXT_ROOT}"
     )
 
     sh("cmake", "--build", build_dir)

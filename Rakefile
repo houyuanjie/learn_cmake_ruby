@@ -44,8 +44,9 @@ task :cmake do
     end
 
     full_ext_dir = File.expand_path(ext_dir, __dir__)
-    full_lib_dir = File.expand_path("lib", __dir__)
-    mkdir_p(full_lib_dir)
+    full_lib_root = File.expand_path("lib", __dir__)
+
+    mkdir_p(full_lib_root)
 
     Dir.mktmpdir do |build_dir|
       puts "[INFO] Created temporary build directory: #{build_dir} for extension: #{ext}"
@@ -57,7 +58,7 @@ task :cmake do
         "-B", build_dir,
         "-G", "Ninja",
         "-DCMAKE_BUILD_TYPE=Debug",
-        "-DCMAKE_INSTALL_PREFIX=#{full_lib_dir}"
+        "-DCMAKE_INSTALL_PREFIX=#{full_lib_root}"
       )
 
       puts "[INFO] Building extension: #{ext}"
