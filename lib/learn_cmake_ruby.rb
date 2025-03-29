@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "learn_cmake_ruby/version"
+require_relative "learn_cmake_ruby/windows" if Gem.win_platform?
 
 begin
   # You load extensions go here at devtime.
